@@ -69,8 +69,6 @@ public class Player : NetworkBehaviour
                     Cursor.lockState = CursorLockMode.Locked;
                 }
             }
-
-            
         }
         if(IsServer && Input.GetKeyDown(KeyCode.H)) // Add hammers to all clients
             addHammersServerRpc(1);
@@ -162,7 +160,7 @@ public class Player : NetworkBehaviour
         }
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [ServerRpc(RequireOwnership = false)] // anyone can call
     private void addHammersServerRpc(int number) {
         if(IsServer) {
             for (int i = 0; i < number; i++) {
