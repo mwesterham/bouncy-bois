@@ -19,6 +19,9 @@ public class Hammer : NetworkBehaviour
      
     void FixedUpdate ()
     {
+        if(target == null)
+            return;
+        
         speed.Value = Mathf.Clamp(speed.Value, minSpeed.Value, maxSpeed.Value);
 
         Vector3 relativePos = (target.position + new Vector3(0, 0f, 0)) - transform.position;
@@ -31,10 +34,16 @@ public class Hammer : NetworkBehaviour
     }
 
     private void OnTriggerEnter(Collider other) {
+        if(target == null && other.gameObject.tag == "Players") {
+            target = other.gameObject.transform;
+            GlobalGameManager.Instance.GameManager.addHammerServerRpc(
+                other.gameObject.GetComponent<NetworkObject>().OwnerClientId, 
+                this.GetComponent<NetworkObject>().NetworkObjectId
+            );
+        }
+
         if(other.gameObject.tag == "Players" || other.gameObject.tag == "Interactables") {
-            Debug.Log("1" + other.gameObject.name);
             if(other.gameObject.transform != target) {
-                Debug.Log("2: " + other.gameObject.name);
                 Vector3 fireDirection = other.gameObject.transform.position - target.position;
                 fireDirection.Normalize();
                 other.gameObject.GetComponent<Rigidbody>().AddForce(fireDirection * 40f, ForceMode.Impulse);

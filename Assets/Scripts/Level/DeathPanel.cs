@@ -7,9 +7,7 @@ public class DeathPanel : NetworkBehaviour
 {
     private void OnTriggerEnter(Collider other) {
         if(other.gameObject.tag == "Players") {
-            other.gameObject.GetComponent<Rigidbody>().velocity = new Vector3();
-            other.gameObject.transform.rotation = new Quaternion();
-            other.gameObject.transform.position = new Vector3(Random.Range(-5f,5f),0,Random.Range(-5f,5f));
+            GlobalGameManager.Instance.GameManager.playerDiedServerRpc(other.gameObject.GetComponent<NetworkObject>().OwnerClientId);
         }
 
         if(other.gameObject.tag == "Interactables") {

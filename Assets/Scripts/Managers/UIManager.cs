@@ -4,15 +4,7 @@ using TMPro;
 
 public class UIManager : NetworkBehaviour
 {
-    public static UIManager Instance;
     public GameObject optionsPanel, pausePanel, textObject;
-
-    private void Start() {
-        if(Instance == null)
-            Instance = this;
-        else
-            Destroy(this);
-    }
 
     public void host() {
         NetworkManager.Singleton.StartHost();
