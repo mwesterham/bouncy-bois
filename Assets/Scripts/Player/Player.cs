@@ -43,23 +43,23 @@ public class Player : NetworkBehaviour
     }
 
     private void Update() {
-        // Game pausing takes precendence
-        if(Input.GetKeyDown(KeyCode.Escape)) {
-            gamePaused = !gamePaused;
-            uiManager.setPausePanelActive(gamePaused);
-            if(gamePaused) {
-                Cursor.lockState = CursorLockMode.None;
-                cam.gameObject.SetActive(false);
-            }
-            else {
-                Cursor.lockState = CursorLockMode.Locked;
-                cam.gameObject.SetActive(true);
-            }
-        }
-        if(gamePaused)
-            return;
-
         if(IsLocalPlayer) {
+            // Game pausing takes precendence
+            if(Input.GetKeyDown(KeyCode.Escape)) {
+                gamePaused = !gamePaused;
+                uiManager.setPausePanelActive(gamePaused);
+                if(gamePaused) {
+                    Cursor.lockState = CursorLockMode.None;
+                    cam.gameObject.SetActive(false);
+                }
+                else {
+                    Cursor.lockState = CursorLockMode.Locked;
+                    cam.gameObject.SetActive(true);
+                }
+            }
+            if(gamePaused)
+                return;
+
             // Update class variables client side
             inputDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
 
@@ -71,9 +71,9 @@ public class Player : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if(gamePaused)
-            return;
         if(IsLocalPlayer) {
+            if(gamePaused)
+                return;
             // Check for input on client side, don't want to call SerRpc every frame bc it causes a lot of network traffic
             // => minimize the number of ServerRpc calls as much as possible
             handleFixedPlayerInput();
@@ -157,7 +157,16 @@ public class Player : NetworkBehaviour
         // Remember, rigid bodies and transforms must be modified client side
         playerRb.velocity = new Vector3();
         transform.rotation = new Quaternion();
-        transform.position = new Vector3(Random.Range(-5f,5f),0,Random.Range(-5f,5f));
+        transform.position = new Vector3(Random.Range(-5f,5f),10,Random.Range(-5f,5f));
+        float x = Random.Range(1,4);
+        if(x == 1)
+            transform.position = new Vector3(Random.Range(-5f,5f),10,5);
+        else if (x == 2)
+            transform.position = new Vector3(Random.Range(-5f,5f),10,-5);
+        else if (x == 3)
+            transform.position = new Vector3(-5+Random.Range(-1f,1f),10,Random.Range(-5f,5f));
+        else if (x == 4)
+            transform.position = new Vector3(5+Random.Range(-1f,1f),10,Random.Range(-5f,5f));
 
         foreach (Hammer h in hammerScripts) {
             Destroy(h.gameObject);
