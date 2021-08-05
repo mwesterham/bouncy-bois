@@ -96,9 +96,6 @@ public class Player : NetworkBehaviour
             nextTimeToBoost = Time.time + boostCooldown;
         }
 
-        if(Input.GetKeyDown(KeyCode.H)) // Call a ServerRpc to spawn a hammer
-            GlobalGameManager.Instance.GameManager.spawnHammerServerRpc(new Vector3(0, -1f, 0));
-
         if(Input.GetKeyDown(KeyCode.L)) // Spawn a hammer on top of the player (adding it to them)
             GlobalGameManager.Instance.GameManager.spawnHammerServerRpc(transform.position);
     }

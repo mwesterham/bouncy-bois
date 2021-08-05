@@ -12,15 +12,31 @@ public class Hammer : NetworkBehaviour
     public NetworkVariable<float> speed = new NetworkVariable<float>(new NetworkVariableSettings {WritePermission = NetworkVariablePermission.Everyone}, 0f);
     public NetworkVariable<float> minSpeed = new NetworkVariable<float>(new NetworkVariableSettings {WritePermission = NetworkVariablePermission.Everyone}, 15f);
     public NetworkVariable<float> maxSpeed = new NetworkVariable<float>(new NetworkVariableSettings {WritePermission = NetworkVariablePermission.Everyone}, 25f);
-    
+
+    public float lifeSpan = 60f;
+    private float originalY, originalSin, rotationSpeed = 50f, floatStrength = 0.3f;
+
     private void Start() {
-        
+        if(Random.Range(1,3) == 1)
+            rotationSpeed *= -1;
+        originalY = transform.position.y + floatStrength;
+        originalSin = Random.Range(-3.1415926f * 2, 3.1415926f * 2);
     }
      
     void FixedUpdate ()
     {
-        if(target == null)
+        if(target == null) {
+            if(IsServer) {
+                transform.Rotate(0, Time.deltaTime * rotationSpeed, 0, Space.Self);
+                transform.localPosition = new Vector3(transform.position.x, originalY + (Mathf.Sin(originalSin + Time.time) * floatStrength), transform.position.z);
+            
+                if(lifeSpan <= 0)
+                    Destroy(this.gameObject);
+                else
+                    lifeSpan -= Time.deltaTime;
+            }
             return;
+        }
         
         speed.Value = Mathf.Clamp(speed.Value, minSpeed.Value, maxSpeed.Value);
 

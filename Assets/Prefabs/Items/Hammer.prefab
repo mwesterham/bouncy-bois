@@ -185,3 +185,4 @@ MonoBehaviour:
     m_InternalValue: 10
   maxSpeed:
     m_InternalValue: 30
+  lifeSpan: 40

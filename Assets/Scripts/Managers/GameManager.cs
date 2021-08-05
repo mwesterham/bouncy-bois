@@ -10,8 +10,8 @@ public class GameManager : NetworkBehaviour
     public GameObject hammer;
 
     [ServerRpc(RequireOwnership = false)] // Only the server can spawn new ones
-    public void spawnHammerServerRpc(Vector3 position) {
-        GameObject h = Instantiate(hammer, position, new Quaternion());
+    public void spawnHammerServerRpc(Vector3 position, Quaternion rotation = new Quaternion()) {
+        GameObject h = Instantiate(hammer, position, rotation);
         h.GetComponent<NetworkObject>().Spawn();
     }
 
