@@ -16,11 +16,11 @@ public class Player : NetworkBehaviour
     public float spinAcceleration = 10f, movementAcceleration = 30f;
     public float bunkerDownAcceleration = 30f;
     public float boostMagnitude = 20f, boostCooldown = 5f;
+    public List<Hammer> hammerScripts = new List<Hammer>();
 
     // private Vector3 inputDirection;
     private Vector3 inputDirection;
     private float nextTimeToBoost;
-    private List<Hammer> hammerScripts = new List<Hammer>();
     private UIManager uiManager;
     private bool gamePaused = false;
 
@@ -99,8 +99,8 @@ public class Player : NetworkBehaviour
         if(Input.GetKeyDown(KeyCode.H)) // Call a ServerRpc to spawn a hammer
             GlobalGameManager.Instance.GameManager.spawnHammerServerRpc(new Vector3(0, -1f, 0));
 
-        if(Input.GetKeyDown(KeyCode.L))
-            addPersonalHammersServerRpc(1);
+        if(Input.GetKeyDown(KeyCode.L)) // Spawn a hammer on top of the player (adding it to them)
+            GlobalGameManager.Instance.GameManager.spawnHammerServerRpc(transform.position);
     }
 
     /*
@@ -167,23 +167,5 @@ public class Player : NetworkBehaviour
             transform.position = new Vector3(-5+Random.Range(-1f,1f),10,Random.Range(-5f,5f));
         else if (x == 4)
             transform.position = new Vector3(5+Random.Range(-1f,1f),10,Random.Range(-5f,5f));
-
-        foreach (Hammer h in hammerScripts) {
-            Destroy(h.gameObject);
-        }
-        hammerScripts.Clear();
-    }
-
-    // Client helper function to spawn our own hammers already attached (unused)
-    [ServerRpc(RequireOwnership = false)] 
-    private void addPersonalHammersServerRpc(int number) {
-        for (int i = 0; i < number; i++) {
-            GameObject h = Instantiate(hammer, new Vector3(Random.Range(-5,5),Random.Range(-5,5),Random.Range(-5,5)), new Quaternion());
-            h.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
-            h.GetComponent<Hammer>().target = transform;
-
-            ulong itemNetID = h.GetComponent<NetworkObject>().NetworkObjectId;
-            addHammerClientRpc(itemNetID);
-        }
     }
 }
