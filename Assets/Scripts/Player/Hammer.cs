@@ -53,7 +53,7 @@ public class Hammer : NetworkBehaviour
         if(target == null && other.gameObject.tag == "Players") {
             target = other.gameObject.transform;
             NetworkObject player = other.gameObject.GetComponent<NetworkObject>();
-            if(!player.IsOwner) {
+            if(player.IsOwner) {
                 GlobalGameManager.Instance.GameManager.addHammerServerRpc(
                     player.OwnerClientId, 
                     this.GetComponent<NetworkObject>().NetworkObjectId

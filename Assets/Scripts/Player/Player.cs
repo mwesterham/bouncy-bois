@@ -12,7 +12,7 @@ public class Player : NetworkBehaviour
     public Rigidbody playerRb;
     public Transform cam;
     public CinemachineFreeLook cincam;
-    public GameObject hammer;
+    public GameObject hammer, playerScoreText;
 
     public float spinAcceleration = 10f, movementAcceleration = 30f;
     public float bunkerDownAcceleration = 30f;
@@ -23,20 +23,19 @@ public class Player : NetworkBehaviour
     // private Vector3 inputDirection;
     private Vector3 inputDirection;
     private float nextTimeToBoost;
-    private UIManager uiManager;
     private bool gamePaused = false;
 
     private void Start()
     {
         if(IsLocalPlayer) {
             points = 0;
-            uiManager = GlobalGameManager.Instance.UIManager;
+            GlobalGameManager.Instance.GameManager.updateHighScoreServerRpc(OwnerClientId, points);
             Cursor.lockState = CursorLockMode.Locked;
             if(IsHost) {
-                uiManager.setPauseText("Stop Hosting and Quit Game");
+                GlobalGameManager.Instance.UIManager.setPauseText("Stop Hosting and Quit Game");
             }
             else if(IsClient) {
-                uiManager.setPauseText("Quit Game");
+                GlobalGameManager.Instance.UIManager.setPauseText("Quit Game");
             }
         }
         else {
@@ -50,8 +49,8 @@ public class Player : NetworkBehaviour
             // Game pausing takes precendence
             if(Input.GetKeyDown(KeyCode.Escape)) {
                 gamePaused = !gamePaused;
-                uiManager.pausePanel.SetActive(gamePaused);
-                uiManager.scorePanel.SetActive(!gamePaused);
+                GlobalGameManager.Instance.UIManager.pausePanel.SetActive(gamePaused);
+                GlobalGameManager.Instance.UIManager.scorePanel.SetActive(!gamePaused);
                 if(gamePaused) {
                     Cursor.lockState = CursorLockMode.None;
                     cam.gameObject.SetActive(false);
@@ -184,7 +183,12 @@ public class Player : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void updateScoreBoardClientRpc(float highScore) {
-        GlobalGameManager.Instance.UIManager.setScoreText("High Score: " + highScore);
+    public void addPlayerScoreClientRpc(ulong id, string name, float score) {
+        GlobalGameManager.Instance.UIManager.addPlayerScore(id, name, score);
+    }
+
+    [ClientRpc]
+    public void removePlayerScoresClientRpc() {
+        GlobalGameManager.Instance.UIManager.removeAllPlayerScores();
     }
 }
