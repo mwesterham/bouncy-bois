@@ -5,6 +5,7 @@ using Cinemachine;
 using MLAPI.Messaging;
 using MLAPI.Spawning;
 using MLAPI.Connection;
+using MLAPI.NetworkVariable;
 
 public class Player : NetworkBehaviour
 {
@@ -17,6 +18,7 @@ public class Player : NetworkBehaviour
     public float bunkerDownAcceleration = 30f;
     public float boostMagnitude = 20f, boostCooldown = 5f;
     public List<Hammer> hammerScripts = new List<Hammer>();
+    public float points;
 
     // private Vector3 inputDirection;
     private Vector3 inputDirection;
@@ -27,6 +29,7 @@ public class Player : NetworkBehaviour
     private void Start()
     {
         if(IsLocalPlayer) {
+            points = 0;
             uiManager = GlobalGameManager.Instance.UIManager;
             Cursor.lockState = CursorLockMode.Locked;
             if(IsHost) {
@@ -47,7 +50,8 @@ public class Player : NetworkBehaviour
             // Game pausing takes precendence
             if(Input.GetKeyDown(KeyCode.Escape)) {
                 gamePaused = !gamePaused;
-                uiManager.setPausePanelActive(gamePaused);
+                uiManager.pausePanel.SetActive(gamePaused);
+                uiManager.scorePanel.SetActive(!gamePaused);
                 if(gamePaused) {
                     Cursor.lockState = CursorLockMode.None;
                     cam.gameObject.SetActive(false);
@@ -98,6 +102,11 @@ public class Player : NetworkBehaviour
 
         if(Input.GetKeyDown(KeyCode.L)) // Spawn a hammer on top of the player (adding it to them)
             GlobalGameManager.Instance.GameManager.spawnHammerServerRpc(transform.position);
+        
+        if(Input.GetKeyDown(KeyCode.E))
+            foreach (Hammer hammer in hammerScripts) {
+                hammer.gameObject.transform.rotation = Quaternion.Euler(Random.Range(-180, 180),Random.Range(-180, 180),Random.Range(-180, 180));
+            }
     }
 
     /*
@@ -144,9 +153,13 @@ public class Player : NetworkBehaviour
 
     [ClientRpc]
     public void addHammerClientRpc(ulong hammerId, ClientRpcParams clientRpcParams = default) {
-        Hammer h = NetworkSpawnManager.SpawnedObjects[hammerId].gameObject.GetComponent<Hammer>();
-        h.target = transform;
-        hammerScripts.Add(h);
+        if(IsLocalPlayer) {
+            Hammer h = NetworkSpawnManager.SpawnedObjects[hammerId].gameObject.GetComponent<Hammer>();
+            h.target = transform;
+            hammerScripts.Add(h);
+            points++;
+            GlobalGameManager.Instance.GameManager.updateHighScoreServerRpc(OwnerClientId, points);
+        }
     }
 
     [ClientRpc]
@@ -164,5 +177,14 @@ public class Player : NetworkBehaviour
             transform.position = new Vector3(-5+Random.Range(-1f,1f),10,Random.Range(-5f,5f));
         else if (x == 4)
             transform.position = new Vector3(5+Random.Range(-1f,1f),10,Random.Range(-5f,5f));
+        
+        hammerScripts.Clear();
+        points = 0;
+        GlobalGameManager.Instance.GameManager.updateHighScoreServerRpc(OwnerClientId, points);
+    }
+
+    [ClientRpc]
+    public void updateScoreBoardClientRpc(float highScore) {
+        GlobalGameManager.Instance.UIManager.setScoreText("High Score: " + highScore);
     }
 }

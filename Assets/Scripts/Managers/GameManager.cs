@@ -4,10 +4,19 @@ using UnityEngine;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.Spawning;
+using MLAPI.NetworkVariable;
 
 public class GameManager : NetworkBehaviour
 {
     public GameObject hammer;
+
+    public UIManager uiManager;
+
+    public NetworkVariable<float> highScore;
+
+    private void Start() {
+        uiManager.setScoreText("High Score: " + highScore.Value);
+    }
 
     [ServerRpc(RequireOwnership = false)] // Only the server can spawn new ones
     public void spawnHammerServerRpc(Vector3 position, Quaternion rotation = new Quaternion()) {
@@ -15,8 +24,9 @@ public class GameManager : NetworkBehaviour
         h.GetComponent<NetworkObject>().Spawn();
     }
 
-    [ServerRpc(RequireOwnership = true)]
+    [ServerRpc(RequireOwnership = false)]
     public void addHammerServerRpc(ulong newPlayerOwner, ulong spawnedObject) {
+        Debug.Log("Called with id: " + newPlayerOwner + " my id: " + OwnerClientId);
         setOwnershipOfServerRpc(newPlayerOwner, spawnedObject);
         
         ClientRpcParams clientRpcParams = new ClientRpcParams
@@ -29,7 +39,7 @@ public class GameManager : NetworkBehaviour
         NetworkObject player = player = NetworkManager.Singleton.ConnectedClients[newPlayerOwner].PlayerObject;
         Player playerScript = player.GetComponent<Player>();
 
-        // Add hammers to server side
+        // Add hammers to server side, this is done automatically for hosts since they are the server
         Hammer h = NetworkSpawnManager.SpawnedObjects[spawnedObject].gameObject.GetComponent<Hammer>();
         playerScript.hammerScripts.Add(h);
 
@@ -62,5 +72,17 @@ public class GameManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = true)]
     public void setOwnershipOfServerRpc(ulong newPlayerOwner, ulong spawnedObject) {
         NetworkSpawnManager.SpawnedObjects[spawnedObject].ChangeOwnership(newPlayerOwner);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void updateHighScoreServerRpc(ulong playerId, float score) {
+        if(score > highScore.Value) {
+            highScore.Value = score;
+        }
+
+        GameObject player = NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject.gameObject;
+        Player playerScript = player.GetComponent<Player>();
+
+        playerScript.updateScoreBoardClientRpc(highScore.Value);
     }
 }

@@ -4,21 +4,22 @@ using TMPro;
 
 public class UIManager : NetworkBehaviour
 {
-    public GameObject optionsPanel, pausePanel, textObject;
+    public GameObject optionsPanel, pausePanel, textObject, scorePanel, scoreText;
 
     public void host() {
         NetworkManager.Singleton.StartHost();
-        setOptionsPanelActive(false);
+        optionsPanel.SetActive(false);
+        justStarted();
     }
 
     public void join() {
         NetworkManager.Singleton.StartClient();
-        setOptionsPanelActive(false);
+        justStarted();
     }
 
     public void startServer() {
         NetworkManager.Singleton.StartServer();
-        setOptionsPanelActive(false);
+        justStarted();
     }
 
     public void stop() {
@@ -28,19 +29,20 @@ public class UIManager : NetworkBehaviour
             NetworkManager.Singleton.StopClient();
         else if(IsServer)
             NetworkManager.Singleton.StopServer();
-        setPausePanelActive(false);
-        setOptionsPanelActive(true);
+        pausePanel.SetActive(false);
+        optionsPanel.SetActive(true);
     }
 
-    public void setOptionsPanelActive(bool b) {
-        optionsPanel.SetActive(b);
-    }
-
-    public void setPausePanelActive(bool b) {
-        pausePanel.SetActive(b);
+    public void justStarted() {
+        optionsPanel.SetActive(false);
+        scorePanel.SetActive(true);
     }
 
     public void setPauseText(string text) {
         textObject.GetComponent<TextMeshProUGUI>().text = text;
+    }
+
+    public void setScoreText(string text) {
+        scoreText.GetComponent<TextMeshProUGUI>().text = text;
     }
 }

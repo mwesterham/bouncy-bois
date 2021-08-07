@@ -52,10 +52,13 @@ public class Hammer : NetworkBehaviour
     private void OnTriggerEnter(Collider other) {
         if(target == null && other.gameObject.tag == "Players") {
             target = other.gameObject.transform;
-            GlobalGameManager.Instance.GameManager.addHammerServerRpc(
-                other.gameObject.GetComponent<NetworkObject>().OwnerClientId, 
-                this.GetComponent<NetworkObject>().NetworkObjectId
-            );
+            NetworkObject player = other.gameObject.GetComponent<NetworkObject>();
+            if(!player.IsOwner) {
+                GlobalGameManager.Instance.GameManager.addHammerServerRpc(
+                    player.OwnerClientId, 
+                    this.GetComponent<NetworkObject>().NetworkObjectId
+                );
+            }
         }
 
         if(other.gameObject.tag == "Players" || other.gameObject.tag == "Interactables") {
