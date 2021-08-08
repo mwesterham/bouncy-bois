@@ -19,7 +19,7 @@ public class Player : NetworkBehaviour
     public float boostMagnitude = 20f, boostCooldown = 5f;
     public List<Hammer> hammerScripts = new List<Hammer>();
     public float points;
-    public NetworkVariableString name = new NetworkVariableString(new NetworkVariableSettings {WritePermission = NetworkVariablePermission.OwnerOnly}, "unnamed");
+    public NetworkVariableString playerName = new NetworkVariableString(new NetworkVariableSettings {WritePermission = NetworkVariablePermission.OwnerOnly}, "unnamed");
 
     // private Vector3 inputDirection;
     private Vector3 inputDirection;
@@ -30,8 +30,8 @@ public class Player : NetworkBehaviour
     {
         if(IsLocalPlayer) {
             string enteredName = GlobalGameManager.Instance.UIManager.getEnteredName();
-            if(enteredName != null && enteredName.CompareTo("") != 0)
-                name.Value = GlobalGameManager.Instance.UIManager.getEnteredName();
+            if(enteredName.Length > 1)
+                playerName.Value = enteredName;
 
             points = 0;
             GlobalGameManager.Instance.GameManager.updateHighScoreServerRpc(OwnerClientId, points);
@@ -104,8 +104,9 @@ public class Player : NetworkBehaviour
             nextTimeToBoost = Time.time + boostCooldown;
         }
 
-        if(Input.GetKeyDown(KeyCode.L)) // Spawn a hammer on top of the player (adding it to them)
-            GlobalGameManager.Instance.GameManager.spawnHammerServerRpc(transform.position);
+        if(IsHost && Input.GetKeyDown(KeyCode.Return)) {
+            GlobalGameManager.Instance.GameManager.openTrapDoorServerRpc();
+        }
         
         if(Input.GetKeyDown(KeyCode.E))
             foreach (Hammer hammer in hammerScripts) {
@@ -174,13 +175,13 @@ public class Player : NetworkBehaviour
         transform.position = new Vector3(Random.Range(-5f,5f),10,Random.Range(-5f,5f));
         float x = Random.Range(1,4);
         if(x == 1)
-            transform.position = new Vector3(Random.Range(-5f,5f),10,5);
+            transform.position = new Vector3(Random.Range(-5f,5f),-90,5);
         else if (x == 2)
-            transform.position = new Vector3(Random.Range(-5f,5f),10,-5);
+            transform.position = new Vector3(Random.Range(-5f,5f),-90,-5);
         else if (x == 3)
-            transform.position = new Vector3(-5+Random.Range(-1f,1f),10,Random.Range(-5f,5f));
+            transform.position = new Vector3(-5+Random.Range(-1f,1f),-90,Random.Range(-5f,5f));
         else if (x == 4)
-            transform.position = new Vector3(5+Random.Range(-1f,1f),10,Random.Range(-5f,5f));
+            transform.position = new Vector3(5+Random.Range(-1f,1f),-90,Random.Range(-5f,5f));
         
         hammerScripts.Clear();
         points = 0;

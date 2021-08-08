@@ -82,8 +82,7 @@ public class UIManager : NetworkBehaviour
 
         foreach (PlayerScoreItem p in playerScoreBoardItemList) {
             GameObject playerScoreInstance = Instantiate(playerScore, scoreBoard.transform);
-            Debug.Log(p.name + ": " + p.score);
-            playerScoreInstance.GetComponent<TextMeshProUGUI>().text = p.name + ": " + p.score;
+            playerScoreInstance.GetComponent<TextMeshProUGUI>().text = p.name + " - " + p.score;
         }
     }
 

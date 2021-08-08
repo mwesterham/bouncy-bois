@@ -9,7 +9,7 @@ using MLAPI.NetworkVariable;
 
 public class GameManager : NetworkBehaviour
 {
-    public GameObject hammer;
+    public GameObject hammer, trapDoorFloor;
 
     public UIManager uiManager;
 
@@ -84,9 +84,13 @@ public class GameManager : NetworkBehaviour
             if(pScript.points > highScore.Value) {
                 highScore.Value = pScript.points;
             }
-            Debug.Log("id: " + p.ClientId + " name: " + pScript.name.Value + " points: " + pScript.points);
-            playerScript.addPlayerScoreClientRpc(p.ClientId, pScript.name.Value, pScript.points);
+            playerScript.addPlayerScoreClientRpc(p.ClientId, pScript.playerName.Value, pScript.points);
         }
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    public void openTrapDoorServerRpc() {
+        trapDoorFloor.SetActive(false);
     }
 
     // Returns the server's copy of this player
