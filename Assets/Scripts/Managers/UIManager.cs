@@ -7,7 +7,7 @@ using MLAPI.Connection;
 
 public class UIManager : NetworkBehaviour
 {
-    public GameObject optionsPanel, pausePanel, textObject, scorePanel, scoreBoard, playerScore;
+    public GameObject optionsPanel, pausePanel, textObject, scorePanel, scoreBoard, playerScore, playerNameText;
 
     private List<PlayerScoreItem> playerScoreBoardItemList = new List<PlayerScoreItem>();
     private SortPlayerScoreItem sorter = new SortPlayerScoreItem();
@@ -48,6 +48,10 @@ public class UIManager : NetworkBehaviour
         textObject.GetComponent<TextMeshProUGUI>().text = text;
     }
 
+    public string getEnteredName() {
+        return playerNameText.GetComponent<TextMeshProUGUI>().text;
+    }
+
     public void addPlayerScore(ulong id, string name, float score) {
         playerScoreBoardItemList.Add(new PlayerScoreItem(id, name, score));
         updateScoreBoard();
@@ -78,7 +82,8 @@ public class UIManager : NetworkBehaviour
 
         foreach (PlayerScoreItem p in playerScoreBoardItemList) {
             GameObject playerScoreInstance = Instantiate(playerScore, scoreBoard.transform);
-            playerScoreInstance.GetComponent<TextMeshProUGUI>().text = "[Player " + p.id + " name]: " + p.score;
+            Debug.Log(p.name + ": " + p.score);
+            playerScoreInstance.GetComponent<TextMeshProUGUI>().text = p.name + ": " + p.score;
         }
     }
 

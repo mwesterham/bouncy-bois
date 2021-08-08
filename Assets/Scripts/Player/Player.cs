@@ -12,13 +12,14 @@ public class Player : NetworkBehaviour
     public Rigidbody playerRb;
     public Transform cam;
     public CinemachineFreeLook cincam;
-    public GameObject hammer, playerScoreText;
+    public GameObject hammer;
 
     public float spinAcceleration = 10f, movementAcceleration = 30f;
     public float bunkerDownAcceleration = 30f;
     public float boostMagnitude = 20f, boostCooldown = 5f;
     public List<Hammer> hammerScripts = new List<Hammer>();
     public float points;
+    public NetworkVariableString name = new NetworkVariableString(new NetworkVariableSettings {WritePermission = NetworkVariablePermission.OwnerOnly}, "unnamed");
 
     // private Vector3 inputDirection;
     private Vector3 inputDirection;
@@ -28,6 +29,10 @@ public class Player : NetworkBehaviour
     private void Start()
     {
         if(IsLocalPlayer) {
+            string enteredName = GlobalGameManager.Instance.UIManager.getEnteredName();
+            if(enteredName != null && enteredName.CompareTo("") != 0)
+                name.Value = GlobalGameManager.Instance.UIManager.getEnteredName();
+
             points = 0;
             GlobalGameManager.Instance.GameManager.updateHighScoreServerRpc(OwnerClientId, points);
             Cursor.lockState = CursorLockMode.Locked;

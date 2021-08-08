@@ -80,12 +80,12 @@ public class GameManager : NetworkBehaviour
 
         highScore.Value = 0;
         foreach (NetworkClient p in NetworkManager.Singleton.ConnectedClientsList) {
-            float thisPlayerPoints = p.PlayerObject.GetComponent<Player>().points;
-            if(thisPlayerPoints > highScore.Value) {
-                highScore.Value = thisPlayerPoints;
+            Player pScript =p.PlayerObject.GetComponent<Player>();
+            if(pScript.points > highScore.Value) {
+                highScore.Value = pScript.points;
             }
-
-            playerScript.addPlayerScoreClientRpc(p.ClientId, "[Player " + p.ClientId + " unique name]", thisPlayerPoints);
+            Debug.Log("id: " + p.ClientId + " name: " + pScript.name.Value + " points: " + pScript.points);
+            playerScript.addPlayerScoreClientRpc(p.ClientId, pScript.name.Value, pScript.points);
         }
     }
 
