@@ -1,24 +1,56 @@
 using System.Collections;
 using System.Collections.Generic;
 using MLAPI;
+using MLAPI.Transports.UNET;
 using UnityEngine;
 using TMPro;
 using MLAPI.Connection;
+using UnityEngine.SceneManagement;
 
 public class UIManager : NetworkBehaviour
 {
-    public GameObject optionsPanel, pausePanel, textObject, scorePanel, scoreBoard, playerScore, playerNameText;
+    public GameObject startMenuPanel,
+    optionsPanel, 
+    pausePanel, 
+    pauseTextObject, 
+    scorePanel, 
+    scoreBoard,
+    playerNameText,
+    playerScore,
+    joinOptions,
+    hostButton, joinButton, ipInput;
+    public TMP_InputField inputField;
 
     private List<PlayerScoreItem> playerScoreBoardItemList = new List<PlayerScoreItem>();
     private SortPlayerScoreItem sorter = new SortPlayerScoreItem();
 
+    public void gotoOptions(bool isHosting) {
+        optionsPanel.SetActive(false);
+        joinOptions.SetActive(true);
+        if(isHosting) {
+            joinButton.SetActive(false);
+            ipInput.SetActive(false);
+        }
+        else
+            hostButton.SetActive(false);
+        
+    }
+    
     public void host() {
         NetworkManager.Singleton.StartHost();
-        optionsPanel.SetActive(false);
         justStarted();
     }
 
     public void join() {
+        string ip = inputField.text;
+        if(ip.Length <= 1) {
+            NetworkManager.Singleton.GetComponentInChildren<UNetTransport>().ConnectAddress = "127.0.0.1";
+        }
+        else {
+            Debug.Log("Connecting to " + ip);
+            NetworkManager.Singleton.GetComponentInChildren<UNetTransport>().ConnectAddress = ip;
+        }
+        
         NetworkManager.Singleton.StartClient();
         justStarted();
     }
@@ -35,17 +67,25 @@ public class UIManager : NetworkBehaviour
             NetworkManager.Singleton.StopClient();
         else if(IsServer)
             NetworkManager.Singleton.StopServer();
-        pausePanel.SetActive(false);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void backToChoice() {
+        joinButton.SetActive(true);
+        ipInput.SetActive(true);
+        hostButton.SetActive(true);
         optionsPanel.SetActive(true);
+        joinOptions.SetActive(false);
     }
 
     public void justStarted() {
-        optionsPanel.SetActive(false);
+        joinOptions.SetActive(false);
+        startMenuPanel.SetActive(false);
         scorePanel.SetActive(true);
     }
 
     public void setPauseText(string text) {
-        textObject.GetComponent<TextMeshProUGUI>().text = text;
+        pauseTextObject.GetComponent<TextMeshProUGUI>().text = text;
     }
 
     public string getEnteredName() {

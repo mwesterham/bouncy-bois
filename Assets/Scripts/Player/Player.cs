@@ -12,7 +12,7 @@ public class Player : NetworkBehaviour
     public Rigidbody playerRb;
     public Transform cam;
     public CinemachineFreeLook cincam;
-    public GameObject hammer;
+    public GameObject hammer, trapDoorFloor;
 
     public float spinAcceleration = 10f, movementAcceleration = 30f;
     public float bunkerDownAcceleration = 30f;
@@ -27,14 +27,14 @@ public class Player : NetworkBehaviour
     private bool gamePaused = false;
 
     private void Start()
-    {
+    {      
         if(IsLocalPlayer) {
             string enteredName = GlobalGameManager.Instance.UIManager.getEnteredName();
             if(enteredName.Length > 1)
                 playerName.Value = enteredName;
-
+            
             points = 0;
-            GlobalGameManager.Instance.GameManager.updateHighScoreServerRpc(OwnerClientId, points);
+            GlobalGameManager.Instance.GameManager.updateHighScoreServerRpc(OwnerClientId, points);                         
             Cursor.lockState = CursorLockMode.Locked;
             if(IsHost) {
                 GlobalGameManager.Instance.UIManager.setPauseText("Stop Hosting and Quit Game");
@@ -47,6 +47,7 @@ public class Player : NetworkBehaviour
             cam.gameObject.SetActive(false);
             cincam.gameObject.SetActive(false);
         }
+        Debug.Log("Player with id=" + OwnerClientId + " and name=" + playerName.Value + " is joining");
     }
 
     private void Update() {
@@ -105,7 +106,7 @@ public class Player : NetworkBehaviour
         }
 
         if(IsHost && Input.GetKeyDown(KeyCode.Return)) {
-            GlobalGameManager.Instance.GameManager.openTrapDoorServerRpc();
+            GlobalGameManager.Instance.GameManager.openTrapDoorServerRpc(OwnerClientId);
         }
         
         if(Input.GetKeyDown(KeyCode.E))
@@ -196,5 +197,10 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     public void removePlayerScoresClientRpc() {
         GlobalGameManager.Instance.UIManager.removeAllPlayerScores();
+    }
+
+    [ClientRpc]
+    public void openTrapDoorClientRpc() {
+        GlobalGameManager.Instance.GameManager.openTrapDoor();
     }
 }

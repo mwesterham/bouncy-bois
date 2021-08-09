@@ -88,13 +88,18 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    [ServerRpc(RequireOwnership = true)]
-    public void openTrapDoorServerRpc() {
-        trapDoorFloor.SetActive(false);
+    [ServerRpc(RequireOwnership = true)] // relay message to all clients
+    public void openTrapDoorServerRpc(ulong hostId) {
+        NetworkObject host = getServerPlayerFromId(hostId);
+        host.GetComponent<Player>().openTrapDoorClientRpc();
     }
 
     // Returns the server's copy of this player
     private NetworkObject getServerPlayerFromId(ulong playerId) {
         return NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject;
+    }
+
+    public void openTrapDoor() {
+        trapDoorFloor.SetActive(false);
     }
 }
