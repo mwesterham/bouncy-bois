@@ -4,7 +4,7 @@
 
 Implementation of MLAPI (Unity's multiplayer networking library) and demonstrates lan hosted multiplayer gameplay.
 
-The goal of the game is to knock off other players of the arena and collect the most "hammers"
+The goal of the game is to propel other players off the arena and collect the most "hammers"
 
 ### Screenshots
 
