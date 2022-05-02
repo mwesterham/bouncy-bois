@@ -8,4 +8,4 @@ The goal of the game is to propel other players off the arena and collect the mo
 
 ### Screenshots
 
-![Alt text](/screenshots/example.png?raw=true "Optional Title")
+![Alt text](/screenshots/example.png?raw=true "BouncyBois running")
