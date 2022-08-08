@@ -2,7 +2,7 @@
 
 ### Description
 
-Implementation of MLAPI (Unity's multiplayer networking library) and demonstrates lan hosted multiplayer gameplay.
+Implementation of MLAPI (Unity's multiplayer networking library) and demonstrates LAN hosted multiplayer gameplay.
 
 The goal of the game is to propel other players off the arena and collect the most "hammers"
 
